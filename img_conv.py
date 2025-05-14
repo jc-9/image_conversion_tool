@@ -2,8 +2,7 @@ import os
 import argparse
 from PIL import Image
 
-
-def convert_image(input_path, output_path, output_format, quality = 80):
+def convert_image(input_path, output_path, output_format, quality=80):
     """Converts a single image to the specified format.
 
     Args:
@@ -17,9 +16,13 @@ def convert_image(input_path, output_path, output_format, quality = 80):
         output_filename = os.path.splitext(os.path.basename(input_path))[0] + f".{output_format.lower()}"
         final_output_path = os.path.join(output_path, output_filename)
 
+        if os.path.exists(final_output_path):
+            print(f"Skipping '{input_path}': '{final_output_path}' already exists.")
+            return
+
         if output_format.lower() == "webp":
             img = img.convert("RGB")  # WebP doesn't always handle all modes well
-            img.save(final_output_path, "webp", quality = quality)
+            img.save(final_output_path, "webp", quality=quality)
         elif output_format.lower() in ["png", "jpeg", "jpg"]:
             img.save(final_output_path)
         else:
@@ -32,7 +35,6 @@ def convert_image(input_path, output_path, output_format, quality = 80):
         print(f"Error: Input file '{input_path}' not found.")
     except Exception as e:
         print(f"An error occurred while processing '{input_path}': {e}")
-
 
 def process_directory(input_dir, output_dir, output_format, quality):
     """Processes all image files in the input directory and converts them.
@@ -57,14 +59,12 @@ def process_directory(input_dir, output_dir, output_format, quality):
             except Exception:
                 print(f"Skipping non-image file or unsupported format: '{input_path}'")
 
-
 def main():
-    parser = argparse.ArgumentParser(description = "Convert a directory of images to a specified format.")
-    parser.add_argument("input_dir", help = "Path to the input directory containing images.")
-    parser.add_argument("output_dir", help = "Path to the output directory to save converted images.")
-    parser.add_argument("output_format", help = "The desired output format (e.g., webp, png, jpg).")
-    parser.add_argument("--quality", type = int, default = 80,
-                        help = "Quality for lossy formats (0-100), default is 80.")
+    parser = argparse.ArgumentParser(description="Convert a directory of images to a specified format.")
+    parser.add_argument("input_dir", help="Path to the input directory containing images.")
+    parser.add_argument("output_dir", help="Path to the output directory to save converted images.")
+    parser.add_argument("output_format", help="The desired output format (e.g., webp, png, jpg).")
+    parser.add_argument("--quality", type=int, default=80, help="Quality for lossy formats (0-100), default is 80.")
 
     args = parser.parse_args()
 
@@ -79,7 +79,6 @@ def main():
 
     process_directory(input_directory, output_directory, output_format, quality)
     print("Image conversion process completed.")
-
 
 if __name__ == "__main__":
     main()
